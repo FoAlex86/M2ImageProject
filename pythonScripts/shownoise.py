@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import argparse
+from datetime import datetime
 
 def extract_noise(clean_image_path, noisy_image_path, intensite_max, mult, output_noise_image_path):
     # Charger les images
@@ -33,6 +34,8 @@ def extract_noise(clean_image_path, noisy_image_path, intensite_max, mult, outpu
             if(intensite > intensite_max):
                 image_noire[y,x] = pixel*mult
 
+    image_noire = np.clip(image_noire, 0, 255).astype(np.uint8)
+
     cv2.imwrite(output_noise_image_path, image_noire)
 
     print("Bruit extrait et enregistré dans", output_noise_image_path)
@@ -43,8 +46,12 @@ if __name__ == "__main__":
     parser.add_argument("image2", help="Chemin de l'image bruitée")
     parser.add_argument("intensite_max", help="intensité_max")
     parser.add_argument("mult", help="multiplier")
-    parser.add_argument("output", help="Chemin de sortie de l'image du bruit")
 
     args = parser.parse_args()
-    extract_noise(args.image1, args.image2, float(args.intensite_max), float(args.mult), args.output)
+
+    now = datetime.now()
+    date_time_string = now.strftime("%Y_%m_%d_%H%M%S")
+
+
+    extract_noise(args.image1, args.image2, float(args.intensite_max), float(args.mult), "out/extractedNoise_"+ date_time_string +".png")
     #extract_noise(args.image1, "", 4, 30, "noise.png")
