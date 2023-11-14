@@ -5,17 +5,6 @@ import cv2
 import sys
 from datetime import datetime
 
-def show_image(image, window_name='Image'):
-    """
-    Affiche une image avec OpenCV.
-
-    :param image: Image à afficher.
-    :param window_name: Nom de la fenêtre (par défaut 'Image').
-    """
-    cv2.imshow(window_name, image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-
 def add_poisson_noise(image, intensity, intensityCorrection = False):
 
     if intensityCorrection:
@@ -75,6 +64,17 @@ def addBlackNoise(image, freq):
 
     return image
 
+def add_white_noiseRGB(image, scale=0.1):
+    # Générer le bruit blanc
+    white_noise = np.random.rand(*image.shape) * scale
+
+    # Ajouter le bruit à l'image
+    noisy_image = image + white_noise * 255
+
+    noisy_image = np.clip(noisy_image, 0, 255).astype(np.uint8)
+
+    return noisy_image
+
 def addBlackNoiseInDarkArea(image, freq):
     hauteur, largeur, _ = image.shape
 
@@ -110,8 +110,9 @@ def process(image_path):
     # Ajouter le bruit à l'image
     #noisy_image = addBlackNoise(image, 10)
     #noisy_image = addSaltPepperNoise(image, 5)
-    #noisy_image = add_gaussian_noise(image, 0, 30)
-    noisy_image = add_poisson_noise(image, 50, True)
+    noisy_image = add_white_noiseRGB(image, 0.4)
+    #noisy_image = add_gaussian_noise(image, 0, 20)
+    #noisy_image = add_poisson_noise(image, 50, True)
 
     now = datetime.now()
     date_time_string = now.strftime("%Y_%m_%d_%H%M%S")
@@ -119,6 +120,6 @@ def process(image_path):
     cv2.imwrite('out/noisy_img' + date_time_string + '.png', noisy_image)
 
 
-image_path = "./in/2048.png"
+image_path = "./in/50000.png"
 
 process(image_path)
